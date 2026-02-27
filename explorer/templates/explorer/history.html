@@ -1,0 +1,124 @@
+{% extends "explorer/base.html" %}
+{% load static %}
+
+{% block content %}
+
+<h1 class="text-center mb-4">📜 Histórico de APODs</h1>
+
+<!-- =========================
+     Topo: Voltar + Filtros + Limpar Histórico
+========================= -->
+<div class="d-flex flex-wrap justify-content-center gap-2 mb-3 align-items-center">
+
+    <a href="{% url 'apod_view' %}" class="btn btn-outline-light">⬅ Voltar ao APOD</a>
+
+    <form method="get" class="d-flex gap-2 flex-wrap align-items-center">
+        <input type="text" name="q" placeholder="🔎 Buscar título..." value="{{ query|default:'' }}" class="form-control">
+        <input type="date" name="start_date" value="{{ start_date|default:'' }}" class="form-control">
+        <input type="date" name="end_date" value="{{ end_date|default:'' }}" class="form-control">
+        <button class="btn btn-primary">Filtrar</button>
+        <a href="{% url 'history_list' %}" class="btn btn-secondary">Limpar</a>
+    </form>
+
+    <form id="limpar-historico-form" method="POST" action="{% url 'limpar_historico' %}" class="d-inline">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">🧹 Limpar Histórico</button>
+    </form>
+
+</div>
+
+<!-- =========================
+     Contador
+========================= -->
+{% if histories %}
+<p class="text-center text-info mb-4" id="history-counter">
+    🔍 {{ histories.paginator.count }} resultado{{ histories.paginator.count|pluralize }}
+    {% if query or start_date or end_date %}• Filtro ativo{% endif %}
+</p>
+{% endif %}
+
+<!-- =========================
+     Lista de históricos
+========================= -->
+{% if histories %}
+<div class="row g-4" id="history-grid">
+    {% for hist in histories %}
+    <div class="col-12 col-md-6 col-lg-4">
+        <div class="card space-card text-light h-100 p-3 text-center">
+            <a href="{{ hist.url }}" target="_blank">
+                <img src="{{ hist.url }}" class="img-fluid rounded mb-2">
+            </a>
+            <h6>{{ hist.title }}</h6>
+            <small>📅 {{ hist.apod_date|date:"d/m/Y" }}</small>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- =========================
+     Paginação
+========================= -->
+{% if histories.has_other_pages %}
+<div class="d-flex justify-content-center mt-4 gap-2 flex-wrap">
+    {% if histories.has_previous %}
+        <a href="?page={{ histories.previous_page_number }}{% if query %}&q={{ query }}{% endif %}{% if start_date %}&start_date={{ start_date }}{% endif %}{% if end_date %}&end_date={{ end_date }}{% endif %}" class="btn btn-outline-light">⬅ Anterior</a>
+    {% endif %}
+    <span class="btn btn-light disabled">Página {{ histories.number }} de {{ histories.paginator.num_pages }}</span>
+    {% if histories.has_next %}
+        <a href="?page={{ histories.next_page_number }}{% if query %}&q={{ query }}{% endif %}{% if start_date %}&start_date={{ start_date }}{% endif %}{% if end_date %}&end_date={{ end_date }}{% endif %}" class="btn btn-outline-light">Próxima ➡</a>
+    {% endif %}
+</div>
+{% endif %}
+
+{% else %}
+<p class="text-center mt-5">
+    Nenhum APOD visitado ainda 😅<br>
+    Abra algumas imagens da <strong>APOD</strong> para criar histórico.
+</p>
+{% endif %}
+
+<!-- =========================
+     Toast discreto sem botão de fechar
+========================= -->
+<div id="toast-historico" class="toast text-bg-success position-fixed top-0 end-0 m-3" role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="toast-body">🧹 Histórico limpo com sucesso!</div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+// =========================
+// AJAX para limpar histórico com toast automático
+// =========================
+const limparForm = document.getElementById("limpar-historico-form");
+const toastElement = document.getElementById("toast-historico");
+const toastBootstrap = new bootstrap.Toast(toastElement, { autohide: true, delay: 3000 });
+
+if (limparForm) {
+    limparForm.addEventListener("submit", e => {
+        e.preventDefault();
+        const formData = new FormData(limparForm);
+
+        fetch(limparForm.action, {
+            method: "POST",
+            body: formData,
+            headers: { 
+                "X-CSRFToken": formData.get("csrfmiddlewaretoken"),
+                "X-Requested-With": "XMLHttpRequest"
+            }
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                document.querySelectorAll("#history-grid > .col-12").forEach(c => c.remove());
+                const counter = document.getElementById("history-counter");
+                if (counter) counter.innerText = "🔍 0 resultados";
+                toastBootstrap.show();
+            }
+        })
+        .catch(() => alert("Erro ao limpar histórico."));
+    });
+}
+</script>
+{% endblock %}

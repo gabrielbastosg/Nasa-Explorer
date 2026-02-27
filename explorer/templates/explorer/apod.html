@@ -1,0 +1,120 @@
+{% extends "explorer/base.html" %}
+{% load static %}
+
+{% block content %}
+
+<h1 class="text-center mb-4">
+    ✦ Foto Astronômica do Dia
+</h1>
+
+<!-- ESTATÍSTICAS -->
+<div class="text-center mb-4">
+    <p>📜 Visitados: <strong>{{ total_history }}</strong></p>
+    <p>⭐ Favoritos: <strong>{{ total_favorites }}</strong></p>
+</div>
+
+<div class="card text-light p-4 mx-auto space-card" style="max-width: 900px;">
+
+    <!-- FORM DATA -->
+    <form method="get" class="text-center mb-4">
+        <input
+            type="date"
+            name="date"
+            value="{{ date_input_format }}"
+            class="form-control w-auto d-inline"
+        >
+        <button class="btn btn-primary ms-2">
+            Ver foto
+        </button>
+    </form>
+
+    {% if error %}
+        <p class="text-danger text-center">{{ error }}</p>
+    {% else %}
+
+        <h3 class="text-center">{{ title }}</h3>
+        <p class="text-center">📅 {{ date }}</p>
+
+        <!-- NAVEGAÇÃO -->
+        <div class="d-flex justify-content-center gap-2 mb-3">
+            <a href="?date={{ prev_date }}" class="btn btn-outline-light">⬅</a>
+            <a href="{% url 'apod_view' %}" class="btn btn-outline-light">Hoje</a>
+            <a href="?date={{ next_date }}" class="btn btn-outline-light">➡</a>
+        </div>
+
+        <!-- IMAGEM -->
+        <img
+            src="{{ image_url }}"
+            class="img-fluid rounded shadow mb-3 d-block mx-auto"
+        >
+
+        <!-- AÇÕES -->
+        <div class="text-center mb-3">
+
+            <!-- DOWNLOAD -->
+            <a href="{{ image_url }}" download="{{ download_name }}" class="btn btn-success">
+                ⬇ Baixar
+            </a>
+
+            <!-- FAVORITO -->
+            <form action="{% url 'add_favorite' %}" method="post" class="d-inline">
+                {% csrf_token %}
+                <input type="hidden" name="title" value="{{ title }}">
+                <input type="hidden" name="url" value="{{ image_url }}">
+                <button class="btn btn-warning">
+                    ⭐ Favoritar
+                </button>
+            </form>
+
+            <!-- CURTIDAS -->
+            {% if history %}
+            <button id="like-btn" class="btn btn-primary">
+                👍 Curtir (<span id="like-count">{{ history.likes }}</span>)
+            </button>
+            {% endif %}
+
+        </div>
+
+        <p class="mt-3 text-start">
+            {{ explanation }}
+        </p>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}
+
+
+{% block scripts %}
+<script>
+const likeBtn = document.getElementById("like-btn");
+const likeCount = document.getElementById("like-count");
+
+if(likeBtn){
+
+    likeBtn.addEventListener("click", () => {
+
+        // trava o botão imediatamente
+        likeBtn.disabled = true;
+
+        fetch("{% url 'like_apod' history.id %}", {
+            method: "POST",
+            headers: {
+                "X-CSRFToken": "{{ csrf_token }}",
+                "X-Requested-With": "XMLHttpRequest"
+            }
+        })
+        .then(res => res.json())
+        .then(data => {
+            likeCount.innerText = data.likes;
+            likeBtn.innerText = "👍 Curtido";
+        })
+        .catch(() => {
+            likeBtn.disabled = false; // reativa se der erro
+        });
+    });
+
+}
+</script>
+{% endblock %}

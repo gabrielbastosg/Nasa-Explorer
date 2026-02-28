@@ -40,6 +40,7 @@
             <a href="?date={{ prev_date }}" class="btn btn-outline-light">⬅</a>
             <a href="{% url 'apod_view' %}" class="btn btn-outline-light">Hoje</a>
             <a href="?date={{ next_date }}" class="btn btn-outline-light">➡</a>
+            <button id="random-btn" class="btn btn-outline-light">🎲 Aleatória</button>
         </div>
 
         <!-- IMAGEM -->
@@ -88,16 +89,13 @@
 
 {% block scripts %}
 <script>
+// --- CURTIDAS ---
 const likeBtn = document.getElementById("like-btn");
 const likeCount = document.getElementById("like-count");
 
 if(likeBtn){
-
     likeBtn.addEventListener("click", () => {
-
-        // trava o botão imediatamente
         likeBtn.disabled = true;
-
         fetch("{% url 'like_apod' history.id %}", {
             method: "POST",
             headers: {
@@ -111,10 +109,52 @@ if(likeBtn){
             likeBtn.innerText = "👍 Curtido";
         })
         .catch(() => {
-            likeBtn.disabled = false; // reativa se der erro
+            likeBtn.disabled = false;
         });
     });
+}
 
+// --- BOTÃO ALEATÓRIO COM FADE ---
+const randomBtn = document.getElementById("random-btn");
+const imgEl = document.querySelector("img.img-fluid");
+const titleEl = document.querySelector("h3.text-center");
+const dateEl = document.querySelector("p.text-center");
+
+function fadeOutIn(el, newSrc, newTitle, newDate){
+    el.style.transition = "opacity 0.5s";
+    el.style.opacity = 0;
+
+    setTimeout(() => {
+        el.src = newSrc;
+        titleEl.innerText = newTitle;
+        dateEl.innerText = "📅 " + newDate;
+        el.onload = () => {
+            el.style.opacity = 1;
+        }
+    }, 500);
+}
+
+if(randomBtn){
+    randomBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        randomBtn.disabled = true;
+
+        fetch("{% url 'random_apod' %}?ajax=1")
+        .then(res => res.json())
+        .then(data => {
+            if(data.error){
+                alert("Erro ao carregar APOD!");
+                randomBtn.disabled = false;
+                return;
+            }
+            fadeOutIn(imgEl, data.image_url, data.title, data.date);
+            randomBtn.disabled = false;
+        })
+        .catch(() => {
+            alert("Erro ao carregar APOD!");
+            randomBtn.disabled = false;
+        });
+    });
 }
 </script>
 {% endblock %}

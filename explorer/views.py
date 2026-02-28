@@ -12,6 +12,7 @@ from django.core.paginator import Paginator
 import unicodedata
 from django.utils.text import slugify 
 from django.views.decorators.csrf import csrf_exempt
+import random
 # =========================
 # Carregando .env
 # =========================
@@ -227,3 +228,26 @@ def like_apod(request, history_id):
         request.session[session_key] = True
 
         return JsonResponse({"likes": hist.likes})
+
+def random_apod(request):
+    start_date = date(1995, 6, 16)
+    end_date = date.today()
+    delta_days = (end_date - start_date).days
+    random_days = random.randint(0, delta_days)
+    random_date = start_date + timedelta(days=random_days)
+
+    # Se for AJAX, retorna JSON com dados da APOD
+    if request.GET.get("ajax"):
+        url = f"https://api.nasa.gov/planetary/apod?api_key={API_KEY}&date={random_date.strftime('%Y-%m-%d')}"
+        response = requests.get(url)
+        if response.status_code == 200:
+            data = response.json()
+            return JsonResponse({
+                "title": data.get("title"),
+                "image_url": data.get("url"),
+                "date": random_date.strftime("%d/%m/%Y"),
+            })
+        return JsonResponse({"error": "Erro ao carregar APOD"}, status=500)
+
+    # Se não for AJAX, redireciona normalmente
+    return redirect(f"/?date={random_date.strftime('%Y-%m-%d')}")

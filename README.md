@@ -1,25 +1,42 @@
-🚀 NASA Explorer
-Projeto Django consumindo a API APOD da NASA.
+# 🚀 NASA Explorer
 
-## Funcionalidades
-- Foto astronômica do dia
-- Histórico de visitas
-- Favoritos
-- Curtidas
-- Download da imagem
-- Botão de imagem aleatória com efeito fade suave (atualização dinâmica da APOD sem recarregar a página)
+Aplicação web desenvolvida com Django que consome a API APOD da NASA para exibir a foto astronômica do dia.
 
-## Como rodar
-1. Instalar dependências:
+O usuário pode curtir, favoritar, baixar imagens e manter um histórico de navegação.
+
+## 🌌 Sobre o projeto
+
+Este projeto foi criado para praticar:
+- Consumo de API externa
+- Django MVC (models, views, templates)
+- Banco de dados
+- Sistema de likes/favoritos
+- Manipulação dinâmica com JavaScript
+- Versionamento com Git
+
+API utilizada: NASA APOD (Astronomy Picture of the Day)
+
+## 🛠 Tecnologias
+- Python
+- Django
+- SQLite
+- HTML/CSS/JS
+- Bootstrap
+
+## ✨ Funcionalidades
+- 📅 Foto astronômica do dia
+- 🔀 Imagem aleatória
+- ❤️ Curtidas (likes)
+- ⭐ Favoritos
+- 🕘 Histórico de visitas
+- ⬇ Download da imagem
+
+## ▶ Como rodar localmente
+
+```bash
+git clone https://github.com/gabrielbastosg/Nasa-Explorer.git
+cd Nasa-Explorer
 
 pip install -r requirements.txt
-
-
-2. Criar arquivo `.env` com sua chave da NASA:
-
-API_KEY=sua_chave_aqui
-
-
-3. Rodar o servidor:
-
+python manage.py migrate
 python manage.py runserver

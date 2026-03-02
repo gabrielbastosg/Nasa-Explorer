@@ -13,4 +13,5 @@ urlpatterns = [
     path('limpar_historico/',views.limpar_historico, name='limpar_historico'),
     path("like/<int:history_id>/", views.like_apod, name="like_apod"),
     path('random/', views.random_apod, name='random_apod'),
+    path('likes/', views.liked_list, name='liked_list'),
 ]

@@ -184,3 +184,15 @@ button:hover,
 @keyframes spin {
     to { transform: rotate(360deg); }
 }
+
+/* =========================
+   HOVER CARDS (galeria curtidas)
+========================= */
+.hover-card {
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.hover-card:hover {
+    transform: scale(1.04) translateY(-4px);
+    box-shadow: 0 0 20px rgba(0,180,255,0.35);
+}

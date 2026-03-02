@@ -1,0 +1,85 @@
+{% extends "explorer/base.html" %}
+
+{% block content %}
+
+<h2 class="mb-4 text-center">👍 Curtidas</h2>
+
+<!-- BOTÕES TOPO -->
+<div class="text-center mb-4">
+
+    <a href="{% url 'apod_view' %}" class="btn btn-outline-light me-2">
+        ⬅ Voltar para APOD
+    </a>
+
+    <a href="?order=likes"
+       class="btn btn-sm {% if order == 'likes' %}btn-warning{% else %}btn-outline-warning{% endif %}">
+        🔥 Ranking
+    </a>
+
+    <a href="?order=recent"
+       class="btn btn-sm {% if order == 'recent' %}btn-info{% else %}btn-outline-info{% endif %}">
+        🕒 Recentes
+    </a>
+
+</div>
+
+
+<!-- GRID GALERIA -->
+<div class="container">
+    <div class="row">
+
+        {% for h in histories %}
+        <div class="col-md-6 col-lg-4 mb-4">
+
+            <div class="card bg-dark text-light h-100 shadow hover-card">
+
+                <!-- IMAGEM -->
+                <img src="{{ h.url }}"
+                     class="card-img-top"
+                     style="aspect-ratio:16/9; object-fit:cover;">
+
+                <!-- CONTEÚDO -->
+                <div class="card-body d-flex flex-column">
+
+                    <h6 class="card-title">{{ h.title }}</h6>
+
+                    <p class="mt-auto mb-2">
+                        👍 <strong>{{ h.likes }}</strong> curtidas
+                    </p>
+
+                    <!-- VER APOD ORIGINAL -->
+                    <a href="{% url 'apod_view' %}?date={{ h.apod_date|date:'Y-m-d' }}"
+                       class="btn btn-sm btn-primary w-100">
+                        Ver APOD
+                    </a>
+
+                </div>
+            </div>
+
+        </div>
+        {% empty %}
+        <div class="text-center">
+            <p>Nenhuma curtida ainda 😢</p>
+        </div>
+        {% endfor %}
+
+    </div>
+</div>
+
+
+<!-- PAGINAÇÃO -->
+<div class="text-center mt-3">
+
+    {% if histories.has_previous %}
+        <a href="?page={{ histories.previous_page_number }}&order={{ order }}"
+           class="btn btn-outline-light btn-sm">⬅ Anterior</a>
+    {% endif %}
+
+    {% if histories.has_next %}
+        <a href="?page={{ histories.next_page_number }}&order={{ order }}"
+           class="btn btn-outline-light btn-sm">Próxima ➡</a>
+    {% endif %}
+
+</div>
+
+{% endblock %}

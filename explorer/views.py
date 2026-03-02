@@ -101,18 +101,21 @@ def add_favorite(request):
             defaults={'date': date.today()}
         )
 
-        # Se for AJAX, retorna JSON
+        # ⭐ contador atualizado
+        total_favorites = Favorite.objects.count()
+
+        # ⭐ resposta AJAX
         if request.headers.get('x-requested-with') == 'XMLHttpRequest':
             return JsonResponse({
                 "id": fav.id,
                 "title": fav.title,
                 "url": fav.url,
                 "date": fav.date.strftime("%d/%m/%Y"),
-                "created": created
+                "created": created,
+                "total_favorites": total_favorites
             })
 
     return redirect(request.META.get("HTTP_REFERER", '/'))
-
 
 # =========================
 # LISTAR FAVORITOS
@@ -236,18 +239,53 @@ def random_apod(request):
     random_days = random.randint(0, delta_days)
     random_date = start_date + timedelta(days=random_days)
 
-    # Se for AJAX, retorna JSON com dados da APOD
-    if request.GET.get("ajax"):
-        url = f"https://api.nasa.gov/planetary/apod?api_key={API_KEY}&date={random_date.strftime('%Y-%m-%d')}"
-        response = requests.get(url)
-        if response.status_code == 200:
-            data = response.json()
-            return JsonResponse({
-                "title": data.get("title"),
-                "image_url": data.get("url"),
-                "date": random_date.strftime("%d/%m/%Y"),
-            })
+    url = f"https://api.nasa.gov/planetary/apod?api_key={API_KEY}&date={random_date.strftime('%Y-%m-%d')}"
+    response = requests.get(url)
+
+    if response.status_code != 200:
         return JsonResponse({"error": "Erro ao carregar APOD"}, status=500)
 
-    # Se não for AJAX, redireciona normalmente
+    data = response.json()
+
+    translator = GoogleTranslator(source='en', target='pt')
+    title_pt = translator.translate(data['title'])
+
+    # 🔥🔥🔥 SALVA NO HISTORY (ESSA É A CORREÇÃO)
+    hist, created = History.objects.get_or_create(
+        title=title_pt,
+        url=data.get('url'),
+        apod_date=random_date
+    )
+
+    if request.GET.get("ajax"):
+        return JsonResponse({
+            "title": title_pt,
+            "image_url": data.get("url"),
+            "date": random_date.strftime("%d/%m/%Y"),
+            "history_id": hist.id
+        })
+
     return redirect(f"/?date={random_date.strftime('%Y-%m-%d')}")
+
+# =========================
+# CURTIDAS
+# =========================
+
+def liked_list(request):
+    order = request.GET.get("order", "likes")  # padrão = ranking
+
+    liked_qs = History.objects.filter(likes__gt=0)
+
+    if order == "recent":
+        liked_qs = liked_qs.order_by('-visited_at')
+    else:
+        liked_qs = liked_qs.order_by('-likes')
+
+    paginator = Paginator(liked_qs, 6)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    return render(request, "explorer/liked.html", {
+        "histories": page_obj,
+        "order": order
+    })

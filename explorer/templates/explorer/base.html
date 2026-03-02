@@ -33,6 +33,9 @@
     <div style="margin-bottom:25px;">
         <a href="{% url 'favorites_list' %}" class="btn btn-warning btn-sm">⭐ Favoritos</a>
         <a href="{% url 'history_list' %}" class="btn btn-info btn-sm">📜 Histórico</a>
+        <a href="{% url 'liked_list' %}" class="btn btn-outline-light">
+    👍  Curtidas
+        </a>
     </div>
 
     {% block content %}

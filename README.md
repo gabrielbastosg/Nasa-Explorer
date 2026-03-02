@@ -79,36 +79,44 @@ Este projeto foi criado para praticar:
 
 ## ▶ Como rodar localmente
 
+## ▶ Como rodar localmente
+
 ### 1. Clonar o repositório
 ```bash
 git clone https://github.com/gabrielbastosg/Nasa-Explorer.git
 cd Nasa-Explorer
-2. Criar ambiente virtual
+```
+
+### 2. Criar ambiente virtual
+```bash
 python -m venv .venv
-source .venv/bin/activate  # Linux/Mac
-.venv\Scripts\activate     # Windows
+```
 
-3. Instalar dependências
+Linux/Mac:
+```bash
+source .venv/bin/activate
+```
+
+Windows:
+```bash
+.venv\Scripts\activate
+```
+
+### 3. Instalar dependências
+```bash
 pip install -r requirements.txt
+```
 
-4. Criar arquivo .env
-
-Crie um arquivo .env na raiz:
-
+### 4. Criar arquivo .env
+```env
 API_KEY=SUA_CHAVE_DA_NASA
+```
 
 Pegue sua chave gratuita em:
 https://api.nasa.gov
 
-5. Rodar o projeto
+### 5. Rodar o projeto
+```bash
 python manage.py migrate
 python manage.py runserver
-
-📚 Estrutura do projeto
-explorer/
- ├─ models.py
- ├─ views.py
- ├─ urls.py
- ├─ templates/
- ├─ static/
-
+```

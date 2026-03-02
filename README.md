@@ -29,6 +29,13 @@ API utilizada: NASA APOD (Astronomy Picture of the Day)
 - ❤️ Curtidas (likes)
 - ⭐ Favoritos
 - 🕘 Histórico de visitas
+- ⭐ Favoritar (AJAX)
+- 👍 Curtir imagens (AJAX)
+- 📜 Histórico automático de visitas
+- 🎲 APOD aleatória com transição suave
+- 📊 Página de ranking de curtidas
+- 🔍 Busca nos favoritos e histórico
+- 📱 Layout responsivo em grid
 - ⬇ Download da imagem
 
 ## ▶ Como rodar localmente

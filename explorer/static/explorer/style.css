@@ -165,11 +165,13 @@ button:hover,
 .loading {
     display: none;
     position: fixed;
+    top: 0;
+    left: 0;
     inset: 0;
     background: rgba(10, 15, 30, 0.85);
     justify-content: center;
     align-items: center;
-    z-index: 999;
+    z-index: 9999;
 }
 
 .spinner {
@@ -195,4 +197,89 @@ button:hover,
 .hover-card:hover {
     transform: scale(1.04) translateY(-4px);
     box-shadow: 0 0 20px rgba(0,180,255,0.35);
+}
+
+/* =========================
+   RESPONSIVIDADE MOBILE
+========================= */
+@media (max-width: 768px) {
+
+    body {
+        padding: 20px;
+    }
+
+    h1 {
+        font-size: 26px;
+        margin-bottom: 25px;
+    }
+
+    .space-card {
+        padding: 20px;
+        margin: 0 10px;
+    }
+
+    input[type="date"] {
+        width: 100%;
+        max-width: 250px;
+        margin-bottom: 10px;
+    }
+
+    .d-flex.gap-2 {
+        flex-direction: column;
+        align-items: center;
+        gap: 10px !important;
+    }
+
+    .d-flex.gap-2 a,
+    #random-btn {
+        width: 100%;
+        max-width: 200px;
+    }
+
+    button,
+    .btn {
+        width: 100%;
+        max-width: 220px;
+        margin-bottom: 10px;
+    }
+
+    /* Vídeo responsivo (16:9) */
+    .ratio {
+        width: 100%;
+        height: auto;
+    }
+
+    iframe {
+        width: 100% !important;
+        aspect-ratio: 16/9; /* mantém proporção 16:9 em mobile */
+    }
+
+    p.explanation {
+        font-size: 14px;
+        opacity: 1;
+    }
+
+}
+
+@media (max-width: 576px) {
+    button, .btn {
+        padding: 14px 20px;
+        font-size: 1rem;
+    }
+
+    input[type="date"] {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+
+    .d-flex.gap-2 {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .d-flex.gap-2 a,
+    .d-flex.gap-2 button {
+        width: 100%;
+        max-width: 220px;
+    }
 }

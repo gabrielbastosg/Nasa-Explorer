@@ -44,49 +44,58 @@ def apod_view(request):
     url = f"https://api.nasa.gov/planetary/apod?api_key={API_KEY}&date={selected_date.strftime('%Y-%m-%d')}"
     response = requests.get(url)
 
+    # ✅ CONTEXT PADRÃO (sempre existe, evita crash)
+    context = {
+        'history': None,
+        'total_favorites': Favorite.objects.count(),
+        'total_history': History.objects.count(),
+    }
+
     if response.status_code == 200:
         data = response.json()
+
+        media_type = data.get("media_type")
+
+        image_url = None
+        video_url = None
+
+        if media_type == "image":
+            image_url = data.get("hdurl") or data.get("url")
+
+        elif media_type == "video":
+            video_url = data.get("url")
 
         translator = GoogleTranslator(source='en', target='pt')
         title_pt = translator.translate(data['title'])
         explanation_pt = translator.translate(data['explanation'])
 
-        # ✅ gerar nome do arquivo para download
         download_name = f"{slugify(title_pt)}.jpg"
 
-        context = {
+        # 🔥 GARANTE HISTORY SEMPRE
+        hist, _ = History.objects.get_or_create(
+            title=title_pt,
+            url=image_url or video_url,
+            apod_date=selected_date
+        )
+
+        context.update({
             'title': title_pt,
-            'image_url': data.get('url'),
+            'image_url': image_url,
+            'video_url': video_url,
             'explanation': explanation_pt,
             'date': selected_date.strftime('%d/%m/%Y'),
             'date_input_format': selected_date.strftime('%Y-%m-%d'),
             'prev_date': prev_date,
             'next_date': next_date,
             'error': '',
-            'download_name': download_name  # adiciona aqui
-        }
-
-        # salvar histórico
-        hist, created = History.objects.get_or_create(
-            title=title_pt,
-            url=data.get('url'),
-            apod_date=selected_date
-        )
-
-        context['history'] = hist
-
-        # estatísticas
-        context.update({
-            'total_favorites': Favorite.objects.count(),
-            'total_history': History.objects.count(),
-            'latest_favorite': Favorite.objects.order_by('-id').first(),
+            'download_name': download_name,
+            'history': hist,
         })
 
     else:
-        context = {'error': 'Erro ao carregar a APOD.'}
+        context['error'] = 'Erro ao carregar a APOD.'
 
     return render(request, 'explorer/apod.html', context)
-
 # =========================
 # ADICIONAR FAVORITO (AJAX READY)
 # =========================
@@ -246,23 +255,42 @@ def random_apod(request):
         return JsonResponse({"error": "Erro ao carregar APOD"}, status=500)
 
     data = response.json()
+    media_type = data.get("media_type")
+
+    image_url = None
+    video_url = None
+
+    if media_type == "image":
+        image_url = data.get("hdurl") or data.get("url")
+    elif media_type == "video":
+        video_url = data.get("url")
 
     translator = GoogleTranslator(source='en', target='pt')
     title_pt = translator.translate(data['title'])
+    explanation_pt = translator.translate(data.get('explanation', ''))
 
-    # 🔥🔥🔥 SALVA NO HISTORY (ESSA É A CORREÇÃO)
+    # 🔥 Salva no histórico
     hist, created = History.objects.get_or_create(
         title=title_pt,
-        url=data.get('url'),
+        url=image_url or video_url,
         apod_date=random_date
     )
 
     if request.GET.get("ajax"):
+        # prev/next para o JS atualizar corretamente setas e calendário
+        prev_date = (random_date - timedelta(days=1)).strftime("%Y-%m-%d")
+        next_date = (random_date + timedelta(days=1)).strftime("%Y-%m-%d")
+
         return JsonResponse({
             "title": title_pt,
-            "image_url": data.get("url"),
+            "image_url": image_url,
+            "video_url": video_url,
+            "explanation": explanation_pt,
             "date": random_date.strftime("%d/%m/%Y"),
-            "history_id": hist.id
+            "date_iso": random_date.strftime("%Y-%m-%d"),
+            "history_id": hist.id,
+            "prev_date": prev_date,
+            "next_date": next_date,
         })
 
     return redirect(f"/?date={random_date.strftime('%Y-%m-%d')}")

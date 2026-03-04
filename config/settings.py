@@ -125,3 +125,14 @@ CACHES = {
     }
 }
 API_KEY = config('API_KEY')
+
+import os
+
+ALLOWED_HOSTS = ["*"]  # depois você pode trocar pelo domínio do Render
+
+STATIC_URL = "/static/"
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
+
+MIDDLEWARE.insert(1, "whitenoise.middleware.WhiteNoiseMiddleware")
+
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"

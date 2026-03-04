@@ -41,8 +41,23 @@ def apod_view(request):
     prev_date = (selected_date - timedelta(days=1)).strftime("%Y-%m-%d")
     next_date = (selected_date + timedelta(days=1)).strftime("%Y-%m-%d")
 
-    url = f"https://api.nasa.gov/planetary/apod?api_key={API_KEY}&date={selected_date.strftime('%Y-%m-%d')}"
-    response = requests.get(url)
+    # =========================
+    # CACHE AQUI 🔥
+    # =========================
+    date_api = selected_date.strftime('%Y-%m-%d')
+    cache_key = f"apod-{date_api}"
+
+    data = cache.get(cache_key)
+
+    if not data:
+        url = f"https://api.nasa.gov/planetary/apod?api_key={API_KEY}&date={date_api}"
+        response = requests.get(url)
+
+        if response.status_code == 200:
+            data = response.json()
+            cache.set(cache_key, data, 60 * 60 * 24)  # 24h
+        else:
+            data = None
 
     # ✅ CONTEXT PADRÃO (sempre existe, evita crash)
     context = {
@@ -51,8 +66,10 @@ def apod_view(request):
         'total_history': History.objects.count(),
     }
 
-    if response.status_code == 200:
-        data = response.json()
+    # =========================
+    # AGORA USA data (não response)
+    # =========================
+    if data:
 
         media_type = data.get("media_type")
 
@@ -71,7 +88,6 @@ def apod_view(request):
 
         download_name = f"{slugify(title_pt)}.jpg"
 
-        # 🔥 GARANTE HISTORY SEMPRE
         hist, _ = History.objects.get_or_create(
             title=title_pt,
             url=image_url or video_url,
@@ -241,6 +257,9 @@ def like_apod(request, history_id):
 
         return JsonResponse({"likes": hist.likes})
 
+# =========================
+# APOD ALEATÓRIA (RANDOM + CACHE)
+# =========================
 def random_apod(request):
     start_date = date(1995, 6, 16)
     end_date = date.today()
@@ -248,13 +267,27 @@ def random_apod(request):
     random_days = random.randint(0, delta_days)
     random_date = start_date + timedelta(days=random_days)
 
-    url = f"https://api.nasa.gov/planetary/apod?api_key={API_KEY}&date={random_date.strftime('%Y-%m-%d')}"
-    response = requests.get(url)
+    # =========================
+    # CACHE 🔥
+    # =========================
+    date_api = random_date.strftime('%Y-%m-%d')
+    cache_key = f"apod-{date_api}"
 
-    if response.status_code != 200:
-        return JsonResponse({"error": "Erro ao carregar APOD"}, status=500)
+    data = cache.get(cache_key)
 
-    data = response.json()
+    if not data:
+        url = f"https://api.nasa.gov/planetary/apod?api_key={API_KEY}&date={date_api}"
+        response = requests.get(url)
+
+        if response.status_code != 200:
+            return JsonResponse({"error": "Erro ao carregar APOD"}, status=500)
+
+        data = response.json()
+        cache.set(cache_key, data, 60 * 60 * 24)  # 24h
+
+    # =========================
+    # resto igual ao seu código
+    # =========================
     media_type = data.get("media_type")
 
     image_url = None
@@ -269,7 +302,6 @@ def random_apod(request):
     title_pt = translator.translate(data['title'])
     explanation_pt = translator.translate(data.get('explanation', ''))
 
-    # 🔥 Salva no histórico
     hist, created = History.objects.get_or_create(
         title=title_pt,
         url=image_url or video_url,
@@ -277,7 +309,6 @@ def random_apod(request):
     )
 
     if request.GET.get("ajax"):
-        # prev/next para o JS atualizar corretamente setas e calendário
         prev_date = (random_date - timedelta(days=1)).strftime("%Y-%m-%d")
         next_date = (random_date + timedelta(days=1)).strftime("%Y-%m-%d")
 
@@ -293,7 +324,7 @@ def random_apod(request):
             "next_date": next_date,
         })
 
-    return redirect(f"/?date={random_date.strftime('%Y-%m-%d')}")
+    return redirect(f"/?date={date_api}")
 
 # =========================
 # CURTIDAS

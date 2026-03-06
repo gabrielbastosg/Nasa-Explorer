@@ -8,18 +8,16 @@ O usuário pode visualizar, curtir, favoritar, baixar imagens e acompanhar o his
 
 Principais telas da aplicação:
 
-📸 Screenshots
-Tela inicial
+## 📸 Screenshots
 
+### Tela Inicial
+![Tela Inicial](screenshots/Tela%20de%20Inicio%20do%20Nasa.png)
 
+### Favoritos
+![Favoritos](screenshots/Tela%20de%20Favoritos.png)
 
-
-Tela de favoritos
-
-
-
-
-Tela de histórico
+### Histórico
+![Histórico](screenshots/Tela%20de%20Historico.png)
 
 
 

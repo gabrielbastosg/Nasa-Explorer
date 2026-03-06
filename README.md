@@ -1,40 +1,50 @@
 🚀 NASA Explorer
 
-Aplicação web feita com Django que consome a API APOD da NASA para exibir a Astronomy Picture of the Day.
+Aplicação web feita com Django que consome a API Astronomy Picture of the Day (APOD) da NASA para exibir imagens e vídeos astronômicos diariamente.
 
 O usuário pode visualizar, curtir, favoritar, baixar imagens e acompanhar o histórico de navegação — tudo com uma interface moderna e interações AJAX (sem recarregar a página).
 
-🌌 Demonstração
+🌐 Demonstração
 
-Principais telas:
+Principais telas da aplicação:
 
-Página principal (APOD diária)
+📸 Screenshots
+Tela inicial
 
-Favoritos
 
-Histórico
 
-Ranking de curtidas
+
+Tela de favoritos
+
+
+
+
+Tela de histórico
+
+
+
 
 🎯 Objetivos do projeto
 
-Este projeto foi criado para praticar:
+Este projeto foi criado para praticar conceitos importantes de desenvolvimento web:
 
 Consumo de API externa
 
-Django (Models, Views, Templates)
+Estrutura de aplicações com Django
+
+Models, Views e Templates
 
 Banco de dados SQLite
 
-AJAX com JavaScript (fetch API)
+Requisições assíncronas com AJAX / Fetch API
 
-Paginação
+Paginação de dados
 
-UX sem reload
+Interface dinâmica sem reload
 
-Organização de projeto real
+Organização de projetos reais
 
-Versionamento com Git/GitHub
+Versionamento com Git e GitHub
 
 🛠 Tecnologias
 
@@ -48,28 +58,31 @@ HTML5
 
 CSS3
 
-JavaScript (Fetch/AJAX)
+JavaScript
+
+Fetch API / AJAX
 
 Bootstrap
 
 ✨ Funcionalidades
 📸 APOD
 
-Foto astronômica do dia
+Exibição da Astronomy Picture of the Day
 
 Navegação por datas
 
-Imagem aleatória
+Imagem aleatória do espaço
 
 Download da imagem
 
-Vídeos do YouTube: se houver, o player embutido pode apresentar Erro 153 em alguns vídeos devido a restrições do YouTube; nesses casos, é exibido um botão “Assistir no YouTube” para abrir diretamente no site.
+Caso o conteúdo seja um vídeo do YouTube, ele é exibido no player embutido.
+Alguns vídeos podem apresentar Erro 153 devido a restrições do YouTube — nesses casos é exibido um botão "Assistir no YouTube".
 
 ⭐ Favoritos
 
-Adicionar/remover favoritos
+Adicionar e remover imagens favoritas
 
-Atualização via AJAX (sem reload)
+Atualização dinâmica via AJAX
 
 Página dedicada com paginação
 
@@ -79,9 +92,9 @@ Busca por título
 
 Sistema de likes por imagem
 
-Atualização via AJAX
+Atualização sem recarregar a página
 
-Página de ranking (mais curtidas primeiro)
+Página de ranking com imagens mais curtidas
 
 Layout em grid responsivo
 
@@ -93,11 +106,11 @@ Filtro por data
 
 Busca por título
 
-Limpar histórico
+Opção para limpar histórico
 
 🎨 Interface
 
-Tema espacial (galáxia)
+Tema espacial inspirado em galáxias
 
 Cards com hover effects
 
@@ -105,28 +118,65 @@ Transições suaves
 
 Layout responsivo
 
-▶ Como rodar localmente
+📂 Estrutura do projeto
+nasa-explorer/
+│
+├── config/          # Configurações do Django
+├── explorer/        # App principal (models, views, templates)
+├── screenshots/     # Imagens usadas no README
+├── staticfiles/     # Arquivos estáticos coletados
+│
+├── manage.py
+├── requirements.txt
+├── README.md
+└── .env
+▶ Como rodar o projeto localmente
 1. Clonar o repositório
 git clone https://github.com/gabrielbastosg/Nasa-Explorer.git
 cd Nasa-Explorer
 2. Criar ambiente virtual
 python -m venv .venv
 
-Linux/Mac:
+Linux / Mac
 
 source .venv/bin/activate
 
-Windows:
+Windows
 
 .venv\Scripts\activate
 3. Instalar dependências
 pip install -r requirements.txt
 4. Criar arquivo .env
+
+Crie um arquivo .env na raiz do projeto:
+
 API_KEY=SUA_CHAVE_DA_NASA
 
-Pegue sua chave gratuita em:
+Você pode obter uma chave gratuita em:
+
 https://api.nasa.gov
 
 5. Rodar o projeto
 python manage.py migrate
 python manage.py runserver
+
+Depois acesse:
+
+http://127.0.0.1:8000
+📌 Aprendizados
+
+Durante o desenvolvimento deste projeto, pratiquei conceitos importantes como:
+
+consumo de APIs externas
+
+cache de requisições
+
+manipulação de dados em Django
+
+comunicação entre backend e frontend com AJAX
+
+organização de um projeto web completo
+
+👨‍💻 Autor
+
+Projeto desenvolvido por Gabriel Bastos como parte dos estudos em desenvolvimento web com Python e Django.
